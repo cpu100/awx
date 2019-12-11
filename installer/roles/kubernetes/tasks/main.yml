@@ -101,6 +101,7 @@
     - name: Helm Install
       shell: |
         helm install awx {{ role_path }}/files/chart \
+        --set pg_hostname={{ pg_hostname }} \
         --set pg_username={{ pg_username }} \
         --set pg_password={{ pg_password }} \
         --set pg_database={{ pg_database }} \
