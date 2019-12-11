@@ -2,6 +2,7 @@
 pg_username:
 pg_password:
 pg_database:
+namespace: awx
 
 # todo
 

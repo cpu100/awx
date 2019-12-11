@@ -103,7 +103,8 @@
         helm install awx {{ role_path }}/files/chart \
         --set pg_username={{ pg_username }} \
         --set pg_password={{ pg_password }} \
-        --set pg_database={{ pg_database }}
+        --set pg_database={{ pg_database }} \
+        --set namespace={{ kubernetes_namespace }}
 
   when:
     - pg_hostname is not defined or pg_hostname == ''
