@@ -5,3 +5,8 @@
   roles:
     - {role: image_build}
     - {role: image_push, when: "docker_registry is defined"}
+
+
+
+# todo 确保这两个库安装好
+# pip3 install requests docker
