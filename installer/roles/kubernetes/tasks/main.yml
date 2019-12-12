@@ -96,8 +96,8 @@
           stable/postgresql
       register: kubernetes_pg_activate
       no_log: true
+      # 已替换 todo
       when: false
-      # todo
     - name: Helm Install
       shell: |
         helm install awx {{ role_path }}/files/chart \

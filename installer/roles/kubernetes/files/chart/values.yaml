@@ -1,9 +1,9 @@
-
-pg_hostname:
-pg_username:
-pg_password:
-pg_database:
 namespace: awx
+
+pg_hostname: postgres
+pg_username: postgres
+pg_password: postgres
+pg_database: postgres
 
 # todo
 
