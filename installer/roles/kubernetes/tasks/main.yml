@@ -99,7 +99,7 @@
       # install at first running, else do upgrade
       shell: |
         echo {{ chart_values | quote }} | \
-        helm upgrade --install awx {{ role_path }}/helm --values -
+        helm upgrade --install --values - awx {{ role_path }}/helm
         # 最后一个杠表示从 stdin 读入，而不是从文件路径
       register: kubernetes_pg_activate
 
