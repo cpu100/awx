@@ -84,7 +84,7 @@
       #   pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
       no_log: true
       set_fact:
-        pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
+        chart_values: "{{ lookup('template', role_path + '/helm/values.yml') }}"
 
     - name: Deploy and Activate Postgres (Kubernetes)
       # shell: |
@@ -99,12 +99,9 @@
       #
       # install at first running, else do upgrade
       shell: |
-        helm upgrade --install awx {{ role_path }}/files/chart \
-        --set pg_hostname={{ pg_hostname | default(postgresql_service_name) }} \
-        --set pg_username={{ pg_username }} \
-        --set pg_password={{ pg_password }} \
-        --set pg_database={{ pg_database }} \
-        --set namespace={{ kubernetes_namespace }}
+        echo {{ chart_values | quote }} | \
+        helm upgrade --install awx {{ role_path }}/helm --values -
+        # 最后一个杠表示从 stdin 读入，而不是从文件路径
       register: kubernetes_pg_activate
       no_log: true
 

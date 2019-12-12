@@ -1,9 +1,9 @@
-namespace: awx
+namespace: {{ kubernetes_namespace }}
 
-pg_hostname: postgres
-pg_username: postgres
-pg_password: postgres
-pg_database: postgres
+pg_hostname: {{ pg_hostname | default(postgresql_service_name) }}
+pg_username: {{ pg_username }}
+pg_password: {{ pg_password }}
+pg_database: {{ pg_database }}
 
 # todo
 
