@@ -102,7 +102,6 @@
         helm upgrade --install awx {{ role_path }}/helm --values -
         # 最后一个杠表示从 stdin 读入，而不是从文件路径
       register: kubernetes_pg_activate
-      no_log: true
 
   when:
     - pg_hostname is not defined or pg_hostname == ''
