@@ -82,8 +82,11 @@
     - name: Template PostgreSQL Deployment (Kubernetes)
       # set_fact:
       #   pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
-      set_fact:
-        chart_values: "{{ lookup('template', role_path + '/helm/values.yaml.j2') }}"
+      # set_fact:
+      #   chart_values: "{{ lookup('template', role_path + '/helm/values.yaml.j2') }}"
+      template:
+        src: "{{ role_path }}/helm/values.yaml.j2"
+        dest: "{{ role_path }}/helm/values.yaml"
 
     - name: Deploy and Activate Postgres (Kubernetes)
       # shell: |
@@ -98,8 +101,10 @@
       #
       # install at first running, else do upgrade
       shell: |
-        echo {{ chart_values | quote }} | \
-        helm upgrade --install awx {{ role_path }}/helm --values -
+        # echo {{ chart_values | quote }} | \
+        helm upgrade --install awx {{ role_path }}/helm
+        # -f {{ role_path }}/helm/values.yaml
+        # --values -
         # 最后一个杠表示从 stdin 读入，而不是从文件路径
       register: kubernetes_pg_activate
 
