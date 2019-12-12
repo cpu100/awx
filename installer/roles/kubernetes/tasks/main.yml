@@ -90,22 +90,10 @@
 
     - name: Deploy and Activate Postgres (Kubernetes)
       # shell: |
-      #   helm repo list || \
+      #   helm repo list | grep stable || \
       #   helm repo add stable https://kubernetes-charts.storage.googleapis.com
-      #   helm repo update
-      #   echo {{ pg_values | quote }} | helm upgrade {{ postgresql_service_name }} --install \
-      #     --namespace {{ kubernetes_namespace }} \
-      #     --version="6.2.1" \
-      #     --values - \
-      #     stable/postgresql
-      #
-      # install at first running, else do upgrade
       shell: |
-        # {{/* echo {{ chart_values | quote }} | \ */}}
         helm upgrade --install awx {{ role_path }}/helm
-        # -f {{ role_path }}/helm/values.yaml
-        # --values -
-        # 最后一个杠表示从 stdin 读入，而不是从文件路径
       register: kubernetes_pg_activate
 
   when:
