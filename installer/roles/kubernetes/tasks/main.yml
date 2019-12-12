@@ -101,7 +101,7 @@
       #
       # install at first running, else do upgrade
       shell: |
-        # echo {{ chart_values | quote }} | \
+        # {{/* echo {{ chart_values | quote }} | \ */}}
         helm upgrade --install awx {{ role_path }}/helm
         # -f {{ role_path }}/helm/values.yaml
         # --values -
