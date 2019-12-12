@@ -14,6 +14,6 @@ insights_url_base: {{ insights_url_base }}
 insights_agent_mime: {{ insights_agent_mime }}
 automation_analytics_url: {{ automation_analytics_url }}
 
-extra_nginx_include: "{{ extra_nginx_include }}"
+extra_nginx_include: {{ extra_nginx_include }}
 
 container_groups_image: {{ container_groups_image }}

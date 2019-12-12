@@ -1,0 +1,11 @@
+web_mem_request: 0.1
+web_cpu_request: 50
+
+task_mem_request: 0.2
+task_cpu_request: 150
+
+rabbitmq_mem_request: 0.2
+rabbitmq_cpu_request: 50
+
+memcached_mem_request: 0.1
+memcached_cpu_request: 50
