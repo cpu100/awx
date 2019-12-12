@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.prefix }}-web-svc
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.prefix }}-web-svc
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8052
+  selector:
+    name: {{ .Values.prefix }}-web-deploy

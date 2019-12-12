@@ -1,0 +1,17 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: {{ .Values.namespace }}
+  name: rabbitmq
+  labels:
+    app: {{ .Values.prefix }}
+    type: LoadBalancer
+spec:
+  type: ClusterIP
+  ports:
+   - name: http
+     port: 15672
+   - name: amqp
+     port: 5672
+  selector:
+    app: {{ .Values.prefix }}
