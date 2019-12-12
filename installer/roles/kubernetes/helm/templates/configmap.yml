@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ kubernetes_deployment_name }}-config
-  namespace: {{ kubernetes_namespace }}
+  name: {{ .Values.prefix }}-config
+  namespace: {{ .Values.namespace }}
 data:
-  {{ kubernetes_deployment_name }}_nginx_conf: |
+  {{ .Values.prefix }}_nginx_conf: |
     #user awx;
 
     worker_processes  1;
@@ -43,25 +43,8 @@ data:
             server 127.0.0.1:8051;
         }
 
-        {% if ssl_certificate is defined %}
         server {
             listen 8052 default_server;
-            server_name _;
-
-            # Redirect all HTTP links to the matching HTTPS page
-            return 301 https://$host$request_uri;
-        }
-        {%endif %}
-
-        server {
-            {% if ssl_certificate is defined %}
-            listen 8053 ssl;
-
-            ssl_certificate /etc/nginx/awxweb.pem;
-            ssl_certificate_key /etc/nginx/awxweb.pem;
-            {% else %}
-            listen 8052 default_server;
-            {% endif %}
 
             # If you have a domain name, this is where to add it
             server_name _;
@@ -116,15 +99,15 @@ data:
                 uwsgi_read_timeout 120s;
                 uwsgi_pass uwsgi;
                 include /etc/nginx/uwsgi_params;
-                {%- if extra_nginx_include is defined %}
-                include {{ extra_nginx_include }};
-                {%- endif %}
+                {{- if .Values.extra_nginx_include }}
+                include {{ .Values.extra_nginx_include }};
+                {{- end }}
                 proxy_set_header X-Forwarded-Port 443;
             }
         }
     }
 
-  {{ kubernetes_deployment_name }}_settings: |
+  {{ .Values.prefix }}_settings: |
     import os
     import socket
     ADMINS = ()
@@ -134,12 +117,12 @@ data:
     # Automatically deprovision pods that go offline
     AWX_AUTO_DEPROVISION_INSTANCES = True
 
-    SYSTEM_TASK_ABS_CPU = {{ ((task_cpu_request|int / 1000) * 4)|int }}
-    SYSTEM_TASK_ABS_MEM = {{ ((task_mem_request|int * 1024) / 100)|int }}
+    SYSTEM_TASK_ABS_CPU = {{ .Values.system_task_abs_cpu }}
+    SYSTEM_TASK_ABS_MEM = {{ .Values.system_task_abs_mem }}
 
-    INSIGHTS_URL_BASE = "{{ insights_url_base }}"
-    INSIGHTS_AGENT_MIME = "{{ insights_agent_mime }}"
-    AUTOMATION_ANALYTICS_URL = "{{ automation_analytics_url }}"
+    INSIGHTS_URL_BASE = "{{ .Values.insights_url_base }}"
+    INSIGHTS_AGENT_MIME = "{{ .Values.insights_agent_mime }}"
+    AUTOMATION_ANALYTICS_URL = "{{ .Values.automation_analytics_url }}"
 
     #Autoprovisioning should replace this
     CLUSTER_HOST_ID = socket.gethostname()
@@ -203,4 +186,4 @@ data:
 
     USE_X_FORWARDED_PORT = True
 
-    AWX_CONTAINER_GROUP_DEFAULT_IMAGE = "{{ container_groups_image }}"
+    AWX_CONTAINER_GROUP_DEFAULT_IMAGE = "{{ .Values.container_groups_image }}"

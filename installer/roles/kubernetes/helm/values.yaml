@@ -1,9 +1,19 @@
 namespace: {{ kubernetes_namespace }}
+prefix: {{ kubernetes_deployment_name }}
 
 pg_hostname: {{ pg_hostname | default(postgresql_service_name) }}
 pg_username: {{ pg_username }}
 pg_password: {{ pg_password }}
 pg_database: {{ pg_database }}
 
-# todo
 
+system_task_abs_cpu: {{ ((task_cpu_request|int / 1000) * 4)|int }}
+system_task_abs_mem: {{ ((task_mem_request|int * 1024) / 100)|int }}
+
+insights_url_base: {{ insights_url_base }}
+insights_agent_mime: {{ insights_agent_mime }}
+automation_analytics_url: {{ automation_analytics_url }}
+
+extra_nginx_include: "{{ extra_nginx_include }}"
+
+container_groups_image: {{ container_groups_image }}
