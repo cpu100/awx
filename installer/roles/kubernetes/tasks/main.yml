@@ -84,7 +84,7 @@
       #   pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
       no_log: true
       set_fact:
-        chart_values: "{{ lookup('template', role_path + '/helm/values.yml') }}"
+        chart_values: "{{ lookup('template', role_path + '/helm/values.yaml') }}"
 
     - name: Deploy and Activate Postgres (Kubernetes)
       # shell: |
