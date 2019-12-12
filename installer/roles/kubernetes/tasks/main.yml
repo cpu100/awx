@@ -80,9 +80,11 @@
 - name: Deploy PostgreSQL (Kubernetes)
   block:
     - name: Template PostgreSQL Deployment (Kubernetes)
+      # set_fact:
+      #   pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
+      no_log: true
       set_fact:
         pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
-      no_log: true
 
     - name: Deploy and Activate Postgres (Kubernetes)
       # shell: |
