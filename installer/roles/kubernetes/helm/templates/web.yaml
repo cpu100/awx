@@ -7,12 +7,9 @@ metadata:
     name: {{ .Values.prefix }}-web-svc
 spec:
   type: ClusterIP
-  externalIPs:
-    - 172.31.209.176
   ports:
     - name: http
-      # port: 80
-      port: 32371
+      port: 80
       targetPort: 8052
   selector:
     name: {{ .Values.prefix }}-web-deploy

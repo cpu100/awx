@@ -3,7 +3,11 @@ web_mem_request: 0.1
 web_cpu_request: 50
 
 task_mem_request: 0.2
-task_cpu_request: 1500
+# 为了让容器顺利跑起来，另外几个都可以设置成虚的
+# 但是 task_cpu_request 不可以小于 100
+# Instance Groups 里面会根据这个值计算 fork 数量（每个 fork 占用 100 的 CPU 资源）
+# 如果 fork 数量小于 0 ，任何 Job 都无法执行
+task_cpu_request: 600
 
 rabbitmq_mem_request: 0.2
 rabbitmq_cpu_request: 50
