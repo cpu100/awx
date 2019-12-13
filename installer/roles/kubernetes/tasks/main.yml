@@ -70,7 +70,7 @@
 - name: Wait for Postgres to activate
   pause:
     seconds: "{{ postgress_activate_wait }}"
-  when: openshift_pg_activate.changed or kubernetes_pg_activate.changed
+  when: kubernetes_pg_activate.changed
 
 - name: Set image names if using custom registry
   block:
