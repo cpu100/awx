@@ -5,14 +5,6 @@
 
 - include_tasks: "{{ tasks }}"
   with_items:
-    - openshift_auth.yml
-    - openshift.yml
-  loop_control:
-    loop_var: tasks
-  when: openshift_host is defined
-
-- include_tasks: "{{ tasks }}"
-  with_items:
     - kubernetes_auth.yml
     - kubernetes.yml
   loop_control:
@@ -51,47 +43,14 @@
   ignore_errors: true
   when: "pg_hostname is not defined or pg_hostname == ''"
 
-- name: Deploy PostgreSQL (OpenShift)
-  block:
-    - name: Template PostgreSQL Deployment (OpenShift)
-      template:
-        src: postgresql-persistent.yml.j2
-        dest: "{{ kubernetes_base_path }}/postgresql-persistent.yml"
-        mode: '0600'
-
-    - name: Deploy and Activate Postgres (OpenShift)
-      shell: |
-        {{ openshift_oc_bin }} new-app --file={{ kubernetes_base_path }}/postgresql-persistent.yml \
-          -e MEMORY_LIMIT={{ pg_memory_limit|default('512') }}Mi \
-          -e DATABASE_SERVICE_NAME=postgresql  \
-          -e POSTGRESQL_MAX_CONNECTIONS={{ pg_max_connections|default(1024) }} \
-          -e POSTGRESQL_USER={{ pg_username }} \
-          -e POSTGRESQL_PASSWORD={{ pg_password | quote }} \
-          -e POSTGRESQL_DATABASE={{ pg_database | quote }} \
-          -e POSTGRESQL_VERSION=10 \
-          -n {{ kubernetes_namespace }}
-      register: openshift_pg_activate
-      no_log: true
-  when:
-    - pg_hostname is not defined or pg_hostname == ''
-    - postgres_svc_details is defined and postgres_svc_details.rc != 0
-    - openshift_host is defined
-
 - name: Deploy PostgreSQL (Kubernetes)
   block:
     - name: Template PostgreSQL Deployment (Kubernetes)
-      # set_fact:
-      #   pg_values: "{{ lookup('template', 'postgresql-values.yml.j2') }}"
-      # set_fact:
-      #   chart_values: "{{ lookup('template', role_path + '/helm/values.yaml.j2') }}"
       template:
         src: "{{ role_path }}/helm/values.yaml.j2"
         dest: "{{ role_path }}/helm/values.yaml"
 
     - name: Deploy and Activate Postgres (Kubernetes)
-      # shell: |
-      #   helm repo list | grep stable || \
-      #   helm repo add stable https://kubernetes-charts.storage.googleapis.com
       shell: |
         helm upgrade --install awx {{ role_path }}/helm
       register: kubernetes_pg_activate
@@ -112,62 +71,6 @@
   pause:
     seconds: "{{ postgress_activate_wait }}"
   when: openshift_pg_activate.changed or kubernetes_pg_activate.changed
-
-- name: Check postgres version and upgrade Postgres if necessary
-  block:
-    - name: Check if Postgres 9.6 is being used
-      shell: |
-        POD=$({{ kubectl_or_oc }} -n {{ kubernetes_namespace }} \
-          get pods -l=name=postgresql --field-selector status.phase=Running -o jsonpath="{.items[0].metadata.name}")
-        oc exec $POD -n {{ kubernetes_namespace }} -- bash -c "psql -tAc 'select version()'"
-      register: pg_version
-    - name: Upgrade postgres if necessary
-      block:
-        - name: Set new pg image
-          shell: |
-            IMAGE=registry.access.redhat.com/rhscl/postgresql-10-rhel7
-            {{ kubectl_or_oc }} -n {{ kubernetes_namespace }} set image dc/postgresql postgresql=$IMAGE
-
-        - name: Wait for change to take affect
-          pause:
-            seconds: 5
-
-        - name: Set env var for pg upgrade
-          shell: |
-            {{ kubectl_or_oc }} -n {{ kubernetes_namespace }} set env dc/postgresql POSTGRESQL_UPGRADE=copy
-
-        - name: Wait for change to take affect
-          pause:
-            seconds: 5
-
-        - name: Set env var for new pg version
-          shell: |
-            {{ kubectl_or_oc }} -n {{ kubernetes_namespace }} set env dc/postgresql POSTGRESQL_VERSION=10
-
-        - name: Wait for Postgres to redeploy
-          pause:
-            seconds: "{{ postgress_activate_wait }}"
-
-        - name: Wait for Postgres to finish upgrading
-          shell: |
-            POD=$({{ kubectl_or_oc }} -n {{ kubernetes_namespace }} \
-              get pods -l=name=postgresql -o jsonpath="{.items[0].metadata.name}")
-            {{ kubectl_or_oc }} -n {{ kubernetes_namespace }} logs $POD | grep 'Upgrade DONE'
-          register: pg_upgrade_logs
-          retries: 360
-          delay: 10
-          until: pg_upgrade_logs is success
-
-        - name: Unset upgrade env var
-          shell: |
-            {{ kubectl_or_oc }} -n {{ kubernetes_namespace }} set env dc/postgresql POSTGRESQL_UPGRADE-
-
-        - name: Wait for Postgres to redeploy
-          pause:
-            seconds: "{{ postgress_activate_wait }}"
-      when: "pg_version is success and '9.6' in pg_version.stdout"
-  when:
-    - pg_hostname is not defined or pg_hostname == ''
 
 - name: Set image names if using custom registry
   block:

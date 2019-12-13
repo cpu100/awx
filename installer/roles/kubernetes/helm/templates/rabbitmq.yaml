@@ -15,3 +15,19 @@ spec:
      port: 5672
   selector:
     app: {{ .Values.prefix }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.prefix }}-rmq-mgmt
+  namespace: {{ .Values.namespace }}
+  labels:
+    name: {{ .Values.prefix }}-rmq-mgmt
+spec:
+  type: ClusterIP
+  ports:
+    - name: rmqmgmt
+      port: 15672
+  selector:
+    name: {{ .Values.prefix }}-web-deploy
