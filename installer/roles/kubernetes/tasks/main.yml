@@ -57,7 +57,6 @@
 
   when:
     - pg_hostname is not defined or pg_hostname == ''
-    - postgres_svc_details is defined and postgres_svc_details.rc != 0
     - kubernetes_context is defined
 
 - name: Set postgresql hostname to helm package service (Kubernetes)

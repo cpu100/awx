@@ -14,3 +14,13 @@ rabbitmq_cpu_request: 50
 
 memcached_mem_request: 0.1
 memcached_cpu_request: 50
+
+
+task_cpu_limit: 900
+# task_mem_limit: 4
+web_cpu_limit: 900
+# web_mem_limit: 2
+rabbitmq_cpu_limit: 900
+# rabbitmq_mem_limit: 3
+memcached_cpu_limit: 900
+# memcached_mem_limit: 2
